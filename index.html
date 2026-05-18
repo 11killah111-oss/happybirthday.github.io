@@ -1,0 +1,1723 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Для тебя ♡</title>
+
+  <!-- Google Fonts: Playfair Display + Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ============================================
+       СБРОС И БАЗОВЫЕ СТИЛИ
+       ============================================ */
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      color: #3d2a54;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    h1, h2, h3, h4, h5 {
+      font-family: 'Playfair Display', serif;
+    }
+
+    /* ============================================
+       АНИМИРОВАННЫЙ ФОНОВЫЙ ГРАДИЕНТ
+       ============================================ */
+    body {
+      background: linear-gradient(135deg, #f3e8ff, #e0cffc, #f0e6ff, #dbc5fa, #f3e8ff);
+      background-size: 400% 400%;
+      animation: gradientShift 20s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%   { background-position: 0% 50%; }
+      25%  { background-position: 100% 50%; }
+      50%  { background-position: 100% 0%; }
+      75%  { background-position: 0% 100%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    /* ============================================
+       ПАРЯЩИЕ ЛЕПЕСТКИ СИРЕНИ (CSS-анимация)
+       ============================================ */
+    .petals-container {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+
+    .petal {
+      position: absolute;
+      top: -40px;
+      opacity: 0.35;
+      animation: petalFall linear infinite;
+      will-change: transform;
+    }
+
+    .petal::before {
+      content: '';
+      display: block;
+      width: var(--size, 14px);
+      height: var(--size, 14px);
+      background: var(--color, #d4a5e8);
+      border-radius: 50% 0 50% 50%;
+      transform: rotate(45deg);
+    }
+
+    @keyframes petalFall {
+      0%   { transform: translateY(0) rotate(0deg) translateX(0); opacity: 0; }
+      10%  { opacity: 0.4; }
+      90%  { opacity: 0.3; }
+      100% { transform: translateY(110vh) rotate(720deg) translateX(80px); opacity: 0; }
+    }
+
+    /* ============================================
+       GLASSMORPHISM КАРТОЧКА (универсальный класс)
+       ============================================ */
+    .glass {
+      background: rgba(255, 255, 255, 0.25);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      border-radius: 24px;
+      box-shadow: 0 8px 32px rgba(100, 60, 150, 0.12);
+    }
+
+    /* ============================================
+       ЭКРАН ВВОДА КОДА (PASSWORD GATE)
+       ============================================ */
+    #password-gate {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #e8d5f5, #d5c0ed, #f0e4fa);
+      background-size: 300% 300%;
+      animation: gradientShift 12s ease infinite;
+      transition: opacity 0.8s ease, visibility 0.8s ease;
+    }
+
+    #password-gate.hidden {
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+    }
+
+    .gate-card {
+      padding: 48px 40px;
+      text-align: center;
+      max-width: 420px;
+      width: 90%;
+    }
+
+    .gate-card h1 {
+      font-size: 2rem;
+      color: #5b3a7a;
+      margin-bottom: 8px;
+    }
+
+    .gate-card .subtitle {
+      font-size: 0.95rem;
+      color: #8b6aad;
+      margin-bottom: 32px;
+      font-weight: 300;
+    }
+
+    .gate-card .lock-icon {
+      font-size: 3rem;
+      margin-bottom: 16px;
+      display: block;
+    }
+
+    .code-input-wrapper {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    #code-input {
+      width: 100%;
+      padding: 16px 20px;
+      font-size: 1.8rem;
+      font-family: 'Playfair Display', serif;
+      text-align: center;
+      letter-spacing: 4px;
+      border: 2px solid rgba(180, 140, 220, 0.4);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.35);
+      color: #4a2d6e;
+      outline: none;
+      transition: border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #code-input:focus {
+      border-color: #a87ccf;
+      box-shadow: 0 0 20px rgba(168, 124, 207, 0.25);
+    }
+
+    #code-input.error {
+      border-color: #e8a0b0;
+      background: rgba(255, 200, 210, 0.3);
+      animation: shake 0.5s ease;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      20%      { transform: translateX(-8px); }
+      40%      { transform: translateX(8px); }
+      60%      { transform: translateX(-5px); }
+      80%      { transform: translateX(5px); }
+    }
+
+    .error-msg {
+      color: #c97088;
+      font-size: 0.85rem;
+      height: 20px;
+      margin-bottom: 12px;
+      transition: opacity 0.3s ease;
+    }
+
+    .btn-enter {
+      width: 100%;
+      padding: 14px;
+      font-size: 1.05rem;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      color: #fff;
+      background: linear-gradient(135deg, #a87ccf, #8b5fbf);
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .btn-enter:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 24px rgba(139, 95, 191, 0.4);
+    }
+
+    .btn-enter:active {
+      transform: scale(0.98);
+    }
+
+    /* ============================================
+       ОСНОВНОЙ КОНТЕНТ
+       ============================================ */
+    #main-content {
+      position: relative;
+      z-index: 1;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 40px 20px 60px;
+      opacity: 0;
+      transition: opacity 1s ease 0.3s;
+    }
+
+    #main-content.visible {
+      opacity: 1;
+    }
+
+    /* Приветственный заголовок */
+    .hero-section {
+      text-align: center;
+      margin-bottom: 48px;
+      padding-top: 20px;
+    }
+
+    .hero-section h1 {
+      font-size: 2.6rem;
+      color: #5b3a7a;
+      margin-bottom: 12px;
+      font-style: italic;
+    }
+
+    .hero-section p {
+      font-size: 1.1rem;
+      color: #7a5a9e;
+      font-weight: 300;
+      line-height: 1.7;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    /* ============================================
+       АУДИОПЛЕЕР
+       ============================================ */
+    .player-section {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 56px;
+    }
+
+    .audio-player {
+      max-width: 480px;
+      width: 100%;
+      padding: 28px 32px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      transition: box-shadow 0.4s ease;
+    }
+
+    .audio-player.playing {
+      box-shadow: 0 0 40px rgba(168, 124, 207, 0.35), 0 8px 32px rgba(100, 60, 150, 0.12);
+      animation: playerPulse 2s ease-in-out infinite;
+    }
+
+    @keyframes playerPulse {
+      0%, 100% { box-shadow: 0 0 30px rgba(168, 124, 207, 0.25), 0 8px 32px rgba(100, 60, 150, 0.12); }
+      50%      { box-shadow: 0 0 50px rgba(168, 124, 207, 0.45), 0 8px 32px rgba(100, 60, 150, 0.15); }
+    }
+
+    .track-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.15rem;
+      color: #5b3a7a;
+      font-style: italic;
+    }
+
+    .player-controls {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      width: 100%;
+    }
+
+    .btn-play {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      border: 2px solid rgba(168, 124, 207, 0.5);
+      background: rgba(255, 255, 255, 0.35);
+      color: #6b3fa0;
+      font-size: 1.3rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .btn-play:hover {
+      background: rgba(168, 124, 207, 0.25);
+      transform: scale(1.08);
+      box-shadow: 0 4px 16px rgba(168, 124, 207, 0.3);
+    }
+
+    .progress-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .progress-bar-container {
+      position: relative;
+      width: 100%;
+      height: 6px;
+      background: rgba(180, 150, 210, 0.25);
+      border-radius: 3px;
+      cursor: pointer;
+      overflow: hidden;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #a87ccf, #7b5fbf);
+      border-radius: 3px;
+      width: 0%;
+      transition: width 0.1s linear;
+    }
+
+    .time-display {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: #9b7db8;
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ============================================
+       СЕКЦИЯ КНИЖНОЙ ПОЛКИ
+       ============================================ */
+    .bookshelf-section {
+      margin-bottom: 60px;
+    }
+
+    .bookshelf-section h2 {
+      text-align: center;
+      font-size: 2rem;
+      color: #5b3a7a;
+      margin-bottom: 40px;
+    }
+
+    .shelf-container {
+      perspective: 900px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 0;
+      padding: 0 10px 0;
+      position: relative;
+    }
+
+    /* Полка (доска) */
+    .shelf-board {
+      position: relative;
+      width: 100%;
+      max-width: 650px;
+      margin: 0 auto;
+    }
+
+    .shelf-board::after {
+      content: '';
+      display: block;
+      height: 18px;
+      background: linear-gradient(180deg, #8b6aad, #7a5a9e);
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 6px 20px rgba(80, 40, 120, 0.3);
+      margin-top: -2px;
+    }
+
+    .books-row {
+      display: flex;
+      justify-content: center;
+      align-items: flex-end;
+      gap: 8px;
+      padding: 0 24px;
+    }
+
+    /* Одна книга (корешок) */
+    .book {
+      width: 90px;
+      height: 260px;
+      border-radius: 4px 8px 8px 4px;
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.4s ease, box-shadow 0.4s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+
+    .book::before {
+      /* Текстура корешка */
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg,
+        rgba(0,0,0,0.12) 0%,
+        rgba(255,255,255,0.15) 15%,
+        rgba(255,255,255,0) 30%,
+        rgba(0,0,0,0.05) 100%
+      );
+      border-radius: inherit;
+      pointer-events: none;
+    }
+
+    .book:hover {
+      transform: translateY(-12px) scale(1.04);
+      box-shadow: 0 12px 32px rgba(180, 140, 60, 0.25), 0 0 20px rgba(255, 215, 100, 0.15);
+    }
+
+    .book.clickable { cursor: pointer; }
+    .book.locked { cursor: default; }
+
+    .book .spine-text {
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.82rem;
+      color: rgba(255, 255, 255, 0.92);
+      text-shadow: 0 1px 3px rgba(0,0,0,0.3);
+      letter-spacing: 1.5px;
+      font-weight: 600;
+      white-space: nowrap;
+      transform: rotate(180deg);
+    }
+
+    /* Золотое тиснение полоски */
+    .book .gold-line {
+      position: absolute;
+      width: 60%;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #d4af37, transparent);
+      left: 20%;
+    }
+    .book .gold-line.top { top: 18px; }
+    .book .gold-line.bottom { bottom: 18px; }
+
+    /* Ленточка «скоро» для закрытых книг */
+    .book .ribbon {
+      position: absolute;
+      top: 14px;
+      right: -28px;
+      background: linear-gradient(135deg, #e8a0cc, #d080b0);
+      color: #fff;
+      font-size: 0.55rem;
+      font-weight: 600;
+      padding: 3px 30px;
+      transform: rotate(45deg);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      box-shadow: 0 2px 8px rgba(200, 100, 150, 0.3);
+    }
+
+    /* Ленточка «День Рождения» */
+    .book .ribbon-bday {
+      position: absolute;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.65rem;
+      color: #ffd700;
+      text-shadow: 0 0 6px rgba(255, 215, 0, 0.5);
+    }
+
+    /* Цвета книг */
+    .book-1 { background: linear-gradient(180deg, #9b7cb8, #7b5fa0); }
+    .book-2 { background: linear-gradient(180deg, #a08bbf, #8470a8); }
+    .book-3 { background: linear-gradient(180deg, #c497d4, #a87cb8); }
+    .book-4 { background: linear-gradient(180deg, #b08ac0, #9070a8); }
+
+    /* ============================================
+       МОДАЛЬНОЕ ОКНО
+       ============================================ */
+    #modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 8000;
+      background: rgba(20, 10, 30, 0.6);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.4s ease, visibility 0.4s ease;
+      padding: 20px;
+    }
+
+    #modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal-card {
+      max-width: 700px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      padding: 36px 32px;
+      position: relative;
+      background: rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+      border-radius: 28px;
+      box-shadow: 0 16px 48px rgba(80, 40, 120, 0.25);
+      transform: scale(0.9) translateY(20px);
+      transition: transform 0.4s ease;
+    }
+
+    #modal-overlay.active .modal-card {
+      transform: scale(1) translateY(0);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 20px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid rgba(180, 140, 220, 0.3);
+      background: rgba(255, 255, 255, 0.3);
+      color: #6b3fa0;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+    }
+
+    .modal-close:hover {
+      background: rgba(168, 124, 207, 0.25);
+      transform: scale(1.1);
+    }
+
+    .modal-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: #5b3a7a;
+      margin-bottom: 24px;
+      text-align: center;
+    }
+
+    /* Галерея */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .gallery-grid img {
+      width: 100%;
+      height: 140px;
+      object-fit: cover;
+      border-radius: 14px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      border: 2px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .gallery-grid img:hover {
+      transform: scale(1.05);
+      box-shadow: 0 6px 20px rgba(100, 60, 150, 0.25);
+    }
+
+    .youtube-embed {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      border-radius: 16px;
+      border: none;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    }
+
+    .empty-message {
+      text-align: center;
+      padding: 40px 20px;
+      color: #8b6aad;
+      font-style: italic;
+      font-size: 1.05rem;
+      line-height: 1.7;
+    }
+
+    .empty-message .emoji {
+      font-size: 2.5rem;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    /* ============================================
+       ПОЛНОЭКРАННЫЙ ПРОСМОТР ФОТО (Lightbox)
+       ============================================ */
+    #lightbox {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 9500;
+      background: rgba(10, 5, 20, 0.92);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    #lightbox.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    #lightbox img {
+      max-width: 90%;
+      max-height: 85vh;
+      border-radius: 12px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.5);
+      object-fit: contain;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 20px;
+      right: 24px;
+      color: #fff;
+      font-size: 2rem;
+      cursor: pointer;
+      background: rgba(255,255,255,0.15);
+      border: none;
+      border-radius: 50%;
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
+    }
+
+    .lightbox-close:hover { background: rgba(255,255,255,0.3); }
+
+    .lightbox-nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #fff;
+      font-size: 2.5rem;
+      cursor: pointer;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
+    }
+
+    .lightbox-nav:hover { background: rgba(255,255,255,0.25); }
+    .lightbox-prev { left: 16px; }
+    .lightbox-next { right: 16px; }
+
+    /* ============================================
+       ФУТЕР
+       ============================================ */
+    footer {
+      text-align: center;
+      padding: 40px 20px;
+      color: #a88cc4;
+      font-size: 0.9rem;
+      font-weight: 300;
+    }
+
+    footer .heart {
+      color: #d080b0;
+      animation: heartbeat 1.5s ease infinite;
+      display: inline-block;
+    }
+
+    @keyframes heartbeat {
+      0%, 100% { transform: scale(1); }
+      15%      { transform: scale(1.2); }
+      30%      { transform: scale(1); }
+      45%      { transform: scale(1.15); }
+      60%      { transform: scale(1); }
+    }
+
+    /* ============================================
+       КОНФЕТТИ / СЕРДЕЧКИ (появляются в день рождения)
+       ============================================ */
+    .confetti-heart {
+      position: fixed;
+      top: -30px;
+      font-size: 1.2rem;
+      opacity: 0.7;
+      animation: confettiFall linear forwards;
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    @keyframes confettiFall {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0.8; }
+      100% { transform: translateY(110vh) rotate(540deg); opacity: 0; }
+    }
+
+    /* Ленточка «С Днём Рождения!» */
+    .bday-banner {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      z-index: 100;
+      text-align: center;
+      padding: 12px;
+      background: linear-gradient(135deg, rgba(200, 120, 180, 0.85), rgba(168, 100, 207, 0.85));
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-style: italic;
+      letter-spacing: 1px;
+      box-shadow: 0 4px 20px rgba(150, 80, 180, 0.3);
+      transform: translateY(-100%);
+      animation: bannerSlideDown 0.8s ease 1.5s forwards;
+    }
+
+    @keyframes bannerSlideDown {
+      to { transform: translateY(0); }
+    }
+
+    /* ============================================
+       АДМИН-ПАНЕЛЬ
+       ============================================ */
+    #admin-panel {
+      display: none;
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    #admin-panel.active {
+      display: block;
+    }
+
+    .admin-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .admin-header h1 {
+      font-size: 2rem;
+      color: #5b3a7a;
+      margin-bottom: 8px;
+    }
+
+    .admin-header p {
+      color: #8b6aad;
+      font-size: 0.95rem;
+    }
+
+    .admin-date-block {
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+
+    .admin-date-block h3 {
+      font-size: 1.2rem;
+      color: #5b3a7a;
+      margin-bottom: 16px;
+    }
+
+    .admin-date-block label {
+      display: block;
+      font-size: 0.85rem;
+      color: #7a5a9e;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .admin-date-block input,
+    .admin-date-block textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid rgba(180, 140, 220, 0.4);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.3);
+      color: #4a2d6e;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      margin-bottom: 12px;
+      transition: border-color 0.3s ease;
+    }
+
+    .admin-date-block input:focus,
+    .admin-date-block textarea:focus {
+      border-color: #a87ccf;
+    }
+
+    .admin-date-block textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+
+    .btn-admin {
+      display: inline-block;
+      padding: 12px 28px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      color: #fff;
+      background: linear-gradient(135deg, #a87ccf, #8b5fbf);
+      border: none;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      margin-top: 8px;
+    }
+
+    .btn-admin:hover {
+      transform: scale(1.03);
+      box-shadow: 0 6px 20px rgba(139, 95, 191, 0.35);
+    }
+
+    .btn-add-photo {
+      padding: 6px 16px;
+      font-size: 0.8rem;
+      background: rgba(168, 124, 207, 0.2);
+      border: 1px solid rgba(168, 124, 207, 0.4);
+      border-radius: 8px;
+      color: #6b3fa0;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-bottom: 12px;
+    }
+
+    .btn-add-photo:hover {
+      background: rgba(168, 124, 207, 0.35);
+    }
+
+    .btn-remove {
+      padding: 4px 10px;
+      font-size: 0.75rem;
+      background: rgba(200, 100, 120, 0.15);
+      border: 1px solid rgba(200, 100, 120, 0.3);
+      border-radius: 6px;
+      color: #c06080;
+      cursor: pointer;
+      margin-left: 8px;
+      transition: background 0.3s ease;
+    }
+
+    .btn-remove:hover {
+      background: rgba(200, 100, 120, 0.3);
+    }
+
+    .photo-entry {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .photo-entry input {
+      margin-bottom: 0 !important;
+      flex: 1;
+    }
+
+    #generated-code {
+      width: 100%;
+      min-height: 200px;
+      padding: 16px;
+      font-family: 'Courier New', monospace;
+      font-size: 0.8rem;
+      border-radius: 12px;
+      border: 1px solid rgba(180, 140, 220, 0.4);
+      background: rgba(30, 15, 50, 0.85);
+      color: #d8c0f0;
+      margin-top: 20px;
+      resize: vertical;
+    }
+
+    .btn-copy {
+      margin-top: 12px;
+      padding: 10px 24px;
+      font-size: 0.9rem;
+      background: linear-gradient(135deg, #6b3fa0, #8b5fbf);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+    }
+
+    .btn-copy:hover {
+      transform: scale(1.03);
+    }
+
+    /* ============================================
+       МОБИЛЬНАЯ АДАПТАЦИЯ
+       ============================================ */
+    @media (max-width: 640px) {
+      .hero-section h1 {
+        font-size: 1.8rem;
+      }
+
+      .hero-section p {
+        font-size: 0.95rem;
+      }
+
+      .gate-card {
+        padding: 32px 24px;
+      }
+
+      .gate-card h1 {
+        font-size: 1.6rem;
+      }
+
+      #code-input {
+        font-size: 1.4rem;
+        letter-spacing: 2px;
+      }
+
+      .audio-player {
+        padding: 20px 24px;
+      }
+
+      .book {
+        width: 70px;
+        height: 210px;
+      }
+
+      .book .spine-text {
+        font-size: 0.68rem;
+        letter-spacing: 1px;
+      }
+
+      .books-row {
+        gap: 5px;
+        padding: 0 10px;
+      }
+
+      .modal-card {
+        padding: 28px 20px;
+        border-radius: 20px;
+      }
+
+      .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 8px;
+      }
+
+      .gallery-grid img {
+        height: 110px;
+      }
+
+      .bookshelf-section h2 {
+        font-size: 1.5rem;
+      }
+
+      .lightbox-nav {
+        width: 40px;
+        height: 40px;
+        font-size: 1.8rem;
+      }
+    }
+
+    @media (max-width: 400px) {
+      .book {
+        width: 60px;
+        height: 180px;
+      }
+
+      .book .spine-text {
+        font-size: 0.6rem;
+      }
+    }
+
+    /* Плавная прокрутка в модалке */
+    .modal-card::-webkit-scrollbar {
+      width: 6px;
+    }
+    .modal-card::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .modal-card::-webkit-scrollbar-thumb {
+      background: rgba(168, 124, 207, 0.3);
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==========================================
+       ПАРЯЩИЕ ЛЕПЕСТКИ
+       ========================================== -->
+  <div class="petals-container" id="petals-container"></div>
+
+  <!-- ==========================================
+       ЭКРАН ВВОДА КОДА
+       ========================================== -->
+  <div id="password-gate">
+    <div class="gate-card glass">
+      <span class="lock-icon">🔐</span>
+      <h1>Введи код</h1>
+      <p class="subtitle">Секретная дата, которая открывает всё</p>
+      <div class="code-input-wrapper">
+        <input
+          type="text"
+          id="code-input"
+          maxlength="10"
+          placeholder="дд.мм.гггг"
+          autocomplete="off"
+          inputmode="numeric"
+        >
+      </div>
+      <p class="error-msg" id="error-msg">&nbsp;</p>
+      <button class="btn-enter" id="btn-enter">Войти</button>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       ОСНОВНОЙ КОНТЕНТ
+       ========================================== -->
+  <div id="main-content">
+
+    <!-- Приветствие -->
+    <section class="hero-section">
+      <h1>Наш маленький мир</h1>
+      <p>Здесь живут наши воспоминания, наша музыка и наши моменты, которые мы ещё создадим вместе</p>
+    </section>
+
+    <!-- Аудиоплеер -->
+    <section class="player-section">
+      <div class="audio-player glass" id="audio-player">
+        <div class="track-name">♪ Наша песня</div>
+        <div class="player-controls">
+          <button class="btn-play" id="btn-play">▶</button>
+          <div class="progress-wrapper">
+            <div class="progress-bar-container" id="progress-bar">
+              <div class="progress-bar-fill" id="progress-fill"></div>
+            </div>
+            <div class="time-display">
+              <span id="current-time">0:00</span>
+              <span id="total-time">0:00</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Книжная полка -->
+    <section class="bookshelf-section">
+      <h2>✦ Наши главы ✦</h2>
+      <div class="shelf-board">
+        <div class="books-row" id="books-row">
+          <!-- Книги рендерятся через JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Футер -->
+    <footer>
+      с любовью, <span class="heart">♡</span> твоя подруга
+    </footer>
+  </div>
+
+  <!-- ==========================================
+       МОДАЛЬНОЕ ОКНО
+       ========================================== -->
+  <div id="modal-overlay">
+    <div class="modal-card glass">
+      <button class="modal-close" id="modal-close">✕</button>
+      <h2 class="modal-title" id="modal-title"></h2>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       LIGHTBOX (полноэкранный просмотр фото)
+       ========================================== -->
+  <div id="lightbox">
+    <button class="lightbox-close" id="lightbox-close">✕</button>
+    <button class="lightbox-nav lightbox-prev" id="lightbox-prev">‹</button>
+    <img src="" alt="фото" id="lightbox-img">
+    <button class="lightbox-nav lightbox-next" id="lightbox-next">›</button>
+  </div>
+
+  <!-- ==========================================
+       АДМИН-ПАНЕЛЬ (скрыта по умолчанию)
+       ========================================== -->
+  <div id="admin-panel">
+    <div class="admin-header">
+      <h1>🛠 Панель управления</h1>
+      <p>Редактируй контент, затем скопируй сгенерированный код</p>
+    </div>
+    <div id="admin-blocks"></div>
+    <div style="text-align:center; margin-top: 20px;">
+      <button class="btn-admin" id="btn-generate">Сгенерировать код data.js</button>
+    </div>
+    <textarea id="generated-code" readonly style="display:none;"></textarea>
+    <div style="text-align:center;">
+      <button class="btn-copy" id="btn-copy" style="display:none;">📋 Скопировать код</button>
+    </div>
+  </div>
+
+  <!-- ==========================================
+       ДАННЫЕ КОНТЕНТА (data.js встроен)
+       ========================================== -->
+  <script>
+    // ============================================
+    // КОНФИГ: URL аудио и данные контента
+    // ============================================
+
+    // Ссылка на аудио-файл (замени на свою)
+    const AUDIO_URL = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3';
+
+    // Правильный код входа
+    const SECRET_CODE = '18042026';
+
+    // Данные для книг и модалок
+    const contentData = {
+      "18-04-2026": {
+        title: "18 апреля 2026",
+        photos: [
+          "https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=600",
+          "https://images.unsplash.com/photo-1543807535-eceef0bc6599?w=600",
+          "https://images.unsplash.com/photo-1516575334481-f85287c2c82d?w=600",
+          "https://images.unsplash.com/photo-1522543558187-768b6df7c25c?w=600"
+        ],
+        youtube: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        clickable: true
+      },
+      "02-05-2026": {
+        title: "2 мая 2026",
+        photos: [
+          "https://images.unsplash.com/photo-1506869640319-fe1a24fd76cb?w=600",
+          "https://images.unsplash.com/photo-1501238295340-c810d3c156d2?w=600",
+          "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?w=600"
+        ],
+        youtube: "https://www.youtube.com/embed/dQw4w9WgXcQ",
+        clickable: true
+      },
+      "22-05-2026": {
+        title: "22 мая 2026 — День Рождения ✦",
+        photos: [],
+        youtube: "",
+        clickable: false,
+        isBirthday: true
+      },
+      "23-05-2026": {
+        title: "23 мая 2026 — Праздник 🎉",
+        photos: [],
+        youtube: "",
+        clickable: false
+      }
+    };
+
+    // Порядок книг на полке
+    const bookOrder = ["18-04-2026", "02-05-2026", "22-05-2026", "23-05-2026"];
+
+    // Цвета корешков книг
+    const bookColors = [
+      'linear-gradient(180deg, #9b7cb8, #7b5fa0)',
+      'linear-gradient(180deg, #a08bbf, #8470a8)',
+      'linear-gradient(180deg, #c497d4, #a87cb8)',
+      'linear-gradient(180deg, #b08ac0, #9070a8)'
+    ];
+
+    // Краткие даты для корешков
+    const spineLabels = [
+      '18.04.2026',
+      '02.05.2026',
+      '22.05.2026',
+      '23.05.2026'
+    ];
+  </script>
+
+  <script>
+    // ============================================
+    // ГЕНЕРАЦИЯ ЛЕПЕСТКОВ
+    // ============================================
+    (function createPetals() {
+      const container = document.getElementById('petals-container');
+      const colors = ['#d4a5e8', '#c890d8', '#e0b5f0', '#b890d0', '#ddb3ee', '#c9a0db'];
+
+      for (let i = 0; i < 25; i++) {
+        const petal = document.createElement('div');
+        petal.className = 'petal';
+        const size = 8 + Math.random() * 14;
+        const left = Math.random() * 100;
+        const delay = Math.random() * 15;
+        const duration = 10 + Math.random() * 12;
+        const color = colors[Math.floor(Math.random() * colors.length)];
+
+        petal.style.cssText = `
+          left: ${left}%;
+          --size: ${size}px;
+          --color: ${color};
+          animation-duration: ${duration}s;
+          animation-delay: ${delay}s;
+        `;
+        container.appendChild(petal);
+      }
+    })();
+
+    // ============================================
+    // ЛОГИКА ВВОДА КОДА
+    // ============================================
+    (function passwordGate() {
+      const gate = document.getElementById('password-gate');
+      const input = document.getElementById('code-input');
+      const btnEnter = document.getElementById('btn-enter');
+      const errorMsg = document.getElementById('error-msg');
+      const mainContent = document.getElementById('main-content');
+
+      // Проверяем sessionStorage — уже входил?
+      if (sessionStorage.getItem('authenticated') === 'true') {
+        gate.classList.add('hidden');
+        mainContent.classList.add('visible');
+        checkAdminMode();
+        return;
+      }
+
+      // Автоформатирование: добавляем точки после 2-й и 4-й цифры
+      input.addEventListener('input', function(e) {
+        let raw = this.value.replace(/\D/g, ''); // только цифры
+        if (raw.length > 8) raw = raw.slice(0, 8);
+
+        let formatted = '';
+        for (let i = 0; i < raw.length; i++) {
+          if (i === 2 || i === 4) formatted += '.';
+          formatted += raw[i];
+        }
+        this.value = formatted;
+
+        // Убираем ошибку при вводе
+        input.classList.remove('error');
+        errorMsg.innerHTML = '&nbsp;';
+      });
+
+      // Проверка по Enter
+      input.addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') attemptLogin();
+      });
+
+      btnEnter.addEventListener('click', attemptLogin);
+
+      function attemptLogin() {
+        const rawCode = input.value.replace(/\D/g, '');
+
+        if (rawCode === SECRET_CODE) {
+          // Успех!
+          sessionStorage.setItem('authenticated', 'true');
+          gate.classList.add('hidden');
+          setTimeout(() => {
+            mainContent.classList.add('visible');
+          }, 300);
+          checkAdminMode();
+        } else {
+          // Ошибка
+          input.classList.add('error');
+          errorMsg.textContent = 'Попробуй ещё раз 💜';
+          setTimeout(() => {
+            input.classList.remove('error');
+          }, 1000);
+        }
+      }
+    })();
+
+    // ============================================
+    // ПРОВЕРКА ADMIN-РЕЖИМА
+    // ============================================
+    function checkAdminMode() {
+      const params = new URLSearchParams(window.location.search);
+      const adminCode = params.get('admin');
+
+      if (adminCode === SECRET_CODE) {
+        document.getElementById('main-content').style.display = 'none';
+        document.getElementById('admin-panel').classList.add('active');
+        renderAdminPanel();
+      }
+    }
+
+    // ============================================
+    // АУДИОПЛЕЕР
+    // ============================================
+    (function audioPlayer() {
+      const audio = new Audio(AUDIO_URL);
+      audio.preload = 'metadata';
+
+      const btnPlay = document.getElementById('btn-play');
+      const progressBar = document.getElementById('progress-bar');
+      const progressFill = document.getElementById('progress-fill');
+      const currentTimeEl = document.getElementById('current-time');
+      const totalTimeEl = document.getElementById('total-time');
+      const playerEl = document.getElementById('audio-player');
+
+      let isPlaying = false;
+
+      btnPlay.addEventListener('click', () => {
+        if (isPlaying) {
+          audio.pause();
+          btnPlay.textContent = '▶';
+          playerEl.classList.remove('playing');
+        } else {
+          audio.play().catch(() => {});
+          btnPlay.textContent = '❚❚';
+          playerEl.classList.add('playing');
+        }
+        isPlaying = !isPlaying;
+      });
+
+      // Обновление прогресса
+      audio.addEventListener('timeupdate', () => {
+        if (audio.duration) {
+          const pct = (audio.currentTime / audio.duration) * 100;
+          progressFill.style.width = pct + '%';
+          currentTimeEl.textContent = formatTime(audio.currentTime);
+        }
+      });
+
+      audio.addEventListener('loadedmetadata', () => {
+        totalTimeEl.textContent = formatTime(audio.duration);
+      });
+
+      // Клик по прогресс-бару для перемотки
+      progressBar.addEventListener('click', (e) => {
+        const rect = progressBar.getBoundingClientRect();
+        const pct = (e.clientX - rect.left) / rect.width;
+        audio.currentTime = pct * audio.duration;
+      });
+
+      // Когда трек закончился
+      audio.addEventListener('ended', () => {
+        isPlaying = false;
+        btnPlay.textContent = '▶';
+        playerEl.classList.remove('playing');
+        progressFill.style.width = '0%';
+      });
+
+      function formatTime(sec) {
+        if (!sec || isNaN(sec)) return '0:00';
+        const m = Math.floor(sec / 60);
+        const s = Math.floor(sec % 60);
+        return m + ':' + (s < 10 ? '0' : '') + s;
+      }
+    })();
+
+    // ============================================
+    // РЕНДЕР КНИЖНОЙ ПОЛКИ
+    // ============================================
+    (function renderBookshelf() {
+      const booksRow = document.getElementById('books-row');
+
+      bookOrder.forEach((key, index) => {
+        const data = contentData[key];
+        const book = document.createElement('div');
+
+        const classNames = ['book', `book-${index + 1}`];
+        if (data.clickable) {
+          classNames.push('clickable');
+        } else {
+          classNames.push('locked');
+        }
+        book.className = classNames.join(' ');
+        book.style.background = bookColors[index];
+        book.setAttribute('data-key', key);
+
+        // Золотые полоски
+        book.innerHTML = `
+          <div class="gold-line top"></div>
+          <span class="spine-text">${spineLabels[index]}</span>
+          <div class="gold-line bottom"></div>
+        `;
+
+        // Ленточка для закрытых книг
+        if (!data.clickable) {
+          const ribbon = document.createElement('div');
+          ribbon.className = 'ribbon';
+          ribbon.textContent = 'скоро';
+          book.appendChild(ribbon);
+        }
+
+        // Звёздочка для дня рождения
+        if (data.isBirthday) {
+          const bdayStar = document.createElement('div');
+          bdayStar.className = 'ribbon-bday';
+          bdayStar.textContent = '★';
+          book.appendChild(bdayStar);
+        }
+
+        // Обработчик клика
+        book.addEventListener('click', () => {
+          if (data.clickable) {
+            openModal(key);
+          } else {
+            openModal(key); // Откроем с сообщением-заглушкой
+          }
+        });
+
+        booksRow.appendChild(book);
+      });
+    })();
+
+    // ============================================
+    // МОДАЛЬНОЕ ОКНО
+    // ============================================
+    const modalOverlay = document.getElementById('modal-overlay');
+    const modalTitle = document.getElementById('modal-title');
+    const modalBody = document.getElementById('modal-body');
+    const modalClose = document.getElementById('modal-close');
+
+    function openModal(key) {
+      const data = contentData[key];
+      modalTitle.textContent = data.title;
+      modalBody.innerHTML = '';
+
+      if (!data.clickable || (data.photos.length === 0 && !data.youtube)) {
+        // Заглушка для будущего контента
+        modalBody.innerHTML = `
+          <div class="empty-message">
+            <span class="emoji">🌸</span>
+            Здесь совсем скоро появятся наши улыбки.<br>
+            Следи за обновлениями!
+          </div>
+        `;
+      } else {
+        // Галерея фотографий
+        if (data.photos.length > 0) {
+          const grid = document.createElement('div');
+          grid.className = 'gallery-grid';
+          data.photos.forEach((url, i) => {
+            const img = document.createElement('img');
+            img.src = url;
+            img.alt = `Фото ${i + 1}`;
+            img.loading = 'lazy';
+            img.addEventListener('click', () => openLightbox(data.photos, i));
+            grid.appendChild(img);
+          });
+          modalBody.appendChild(grid);
+        }
+
+        // YouTube
+        if (data.youtube) {
+          const iframe = document.createElement('iframe');
+          iframe.className = 'youtube-embed';
+          iframe.src = data.youtube;
+          iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
+          iframe.allowFullscreen = true;
+          modalBody.appendChild(iframe);
+        }
+      }
+
+      modalOverlay.classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove('active');
+      document.body.style.overflow = '';
+      // Удаляем iframe чтобы остановить видео
+      const iframe = modalBody.querySelector('iframe');
+      if (iframe) iframe.src = '';
+    }
+
+    modalClose.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+
+    // Закрытие по Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (document.getElementById('lightbox').classList.contains('active')) {
+          closeLightbox();
+        } else if (modalOverlay.classList.contains('active')) {
+          closeModal();
+        }
+      }
+    });
+
+    // ============================================
+    // LIGHTBOX (полноэкранный просмотр фото)
+    // ============================================
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightbox-img');
+    const lightboxClose = document.getElementById('lightbox-close');
+    const lightboxPrev = document.getElementById('lightbox-prev');
+    const lightboxNext = document.getElementById('lightbox-next');
+
+    let currentPhotos = [];
+    let currentPhotoIndex = 0;
+
+    function openLightbox(photos, index) {
+      currentPhotos = photos;
+      currentPhotoIndex = index;
+      lightboxImg.src = photos[index];
+      lightbox.classList.add('active');
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('active');
+    }
+
+    function showPhoto(direction) {
+      currentPhotoIndex += direction;
+      if (currentPhotoIndex < 0) currentPhotoIndex = currentPhotos.length - 1;
+      if (currentPhotoIndex >= currentPhotos.length) currentPhotoIndex = 0;
+      lightboxImg.src = currentPhotos[currentPhotoIndex];
+    }
+
+    lightboxClose.addEventListener('click', closeLightbox);
+    lightboxPrev.addEventListener('click', () => showPhoto(-1));
+    lightboxNext.addEventListener('click', () => showPhoto(1));
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeLightbox();
+    });
+
+    // Свайп на мобильных
+    let touchStartX = 0;
+    lightbox.addEventListener('touchstart', (e) => {
+      touchStartX = e.touches[0].clientX;
+    });
+    lightbox.addEventListener('touchend', (e) => {
+      const diff = touchStartX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 50) {
+        showPhoto(diff > 0 ? 1 : -1);
+      }
+    });
+
+    // Стрелки клавиатуры
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('active')) return;
+      if (e.key === 'ArrowLeft') showPhoto(-1);
+      if (e.key === 'ArrowRight') showPhoto(1);
+    });
+
+    // ============================================
+    // ПРОВЕРКА ДНЯ РОЖДЕНИЯ (22 мая)
+    // ============================================
+    (function checkBirthday() {
+      const today = new Date();
+      const isBirthday = today.getMonth() === 4 && today.getDate() === 22; // месяцы с 0
+
+      if (isBirthday) {
+        // Показываем баннер
+        const banner = document.createElement('div');
+        banner.className = 'bday-banner';
+        banner.innerHTML = '🎂 С Днём Рождения! Ты — лучшее, что случилось 🎂';
+        document.body.appendChild(banner);
+
+        // Конфетти из сердечек
+        const hearts = ['💜', '💕', '🌸', '✨', '💗', '🦋', '🌷'];
+        function spawnHeart() {
+          const el = document.createElement('div');
+          el.className = 'confetti-heart';
+          el.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+          el.style.left = Math.random() * 100 + '%';
+          el.style.animationDuration = (4 + Math.random() * 5) + 's';
+          el.style.fontSize = (0.8 + Math.random() * 1.2) + 'rem';
+          document.body.appendChild(el);
+          el.addEventListener('animationend', () => el.remove());
+        }
+
+        // Запускаем сердечки каждые 400ms в течение 30 секунд
+        let counter = 0;
+        const interval = setInterval(() => {
+          spawnHeart();
+          counter++;
+          if (counter > 75) clearInterval(interval);
+        }, 400);
+      }
+    })();
+
+    // ============================================
+    // АДМИН-ПАНЕЛЬ
+    // ============================================
+    function renderAdminPanel() {
+      const container = document.getElementById('admin-blocks');
+      container.innerHTML = '';
+
+      bookOrder.forEach((key) => {
+        const data = contentData[key];
+        const block = document.createElement('div');
+        block.className = 'admin-date-block glass';
+
+        let photosHTML = '';
+        data.photos.forEach((url, i) => {
+          photosHTML += `
+            <div class="photo-entry">
+              <input type="text" value="${url}" data-key="${key}" data-photo-index="${i}" class="photo-url-input">
+              <button class="btn-remove" onclick="removePhoto('${key}', ${i})">✕</button>
+            </div>
+          `;
+        });
+
+        block.innerHTML = `
+          <h3>${data.title}</h3>
+          <label>Фотографии (URL):</label>
+          <div id="photos-${key}">
+            ${photosHTML}
+          </div>
+          <button class="btn-add-photo" onclick="addPhotoInput('${key}')">+ Добавить фото</button>
+          <label>YouTube embed URL:</label>
+          <input type="text" value="${data.youtube || ''}" data-key="${key}" class="youtube-input" placeholder="https://www.youtube.com/embed/VIDEO_ID">
+        `;
+
+        container.appendChild(block);
+      });
+
+      // Генерация кода
+      document.getElementById('btn-generate').addEventListener('click', generateCode);
+      document.getElementById('btn-copy').addEventListener('click', copyCode);
+    }
+
+    // Добавить поле для фото
+    window.addPhotoInput = function(key) {
+      const container = document.getElementById(`photos-${key}`);
+      const div = document.createElement('div');
+      div.className = 'photo-entry';
+      div.innerHTML = `
+        <input type="text" value="" data-key="${key}" data-photo-index="new" class="photo-url-input" placeholder="https://...">
+        <button class="btn-remove" onclick="this.parentElement.remove()">✕</button>
+      `;
+      container.appendChild(div);
+    };
+
+    // Удалить фото
+    window.removePhoto = function(key, index) {
+      const container = document.getElementById(`photos-${key}`);
+      const entries = container.querySelectorAll('.photo-entry');
+      if (entries[index]) entries[index].remove();
+    };
+
+    // Генерация кода
+    function generateCode() {
+      const newData = {};
+
+      bookOrder.forEach((key) => {
+        const data = contentData[key];
+        const photos = [];
+        const photoInputs = document.querySelectorAll(`#photos-${key} .photo-url-input`);
+        photoInputs.forEach(input => {
+          if (input.value.trim()) photos.push(input.value.trim());
+        });
+
+        const youtubeInput = document.querySelector(`.youtube-input[data-key="${key}"]`);
+        const youtube = youtubeInput ? youtubeInput.value.trim() : '';
+
+        newData[key] = {
+          title: data.title,
+          photos: photos,
+          youtube: youtube,
+          clickable: data.clickable
+        };
+
+        if (data.isBirthday) newData[key].isBirthday = true;
+      });
+
+      const code = `const contentData = ${JSON.stringify(newData, null, 2)};`;
+      const textarea = document.getElementById('generated-code');
+      textarea.value = code;
+      textarea.style.display = 'block';
+      document.getElementById('btn-copy').style.display = 'inline-block';
+    }
+
+    // Копирование кода
+    function copyCode() {
+      const textarea = document.getElementById('generated-code');
+      textarea.select();
+      navigator.clipboard.writeText(textarea.value).then(() => {
+        const btn = document.getElementById('btn-copy');
+        btn.textContent = '✓ Скопировано!';
+        setTimeout(() => { btn.textContent = '📋 Скопировать код'; }, 2000);
+      });
+    }
+  </script>
+
+</body>
+</html>
